@@ -132,41 +132,57 @@ function clearLinesAndMarkers()
 }
 
 var myIcon = L.divIcon({className: 'leaflet-div-icon'});
+
 function drawLineAndMarkers(route)
 {
   var latlngs = [];
   var dist = 0, distText;
   var vias = [], via;
-  for(var routes in route)
+
+  if(route == null)
   {
-    var i = route[routes];
-
-    var X, Y, name;
-    X = locations[i].x;
-    Y = locations[i].y;
-    name = locations[i].name;
-    if(routes < route.length-1)
+    via = "via complete inactivity";
+  }
+  else if(route != null)
+  {
+    for(var routes in route)
     {
-      var next = parseInt(routes)+1,
-          j = route[next],
-          Xn = locations[j].x,
-          Yn = locations[j].y;
+      var i = route[routes];
 
-      dist += distMatrix[i][j];
+      var X, Y, name;
+      X = locations[i].x;
+      Y = locations[i].y;
+      name = locations[i].name;
+      if(routes < route.length-1)
+      {
+        var next = parseInt(routes)+1,
+            j = route[next],
+            Xn = locations[j].x,
+            Yn = locations[j].y;
+
+        dist += distMatrix[i][j];
+      }
+
+      if(routes == (route.length-1))
+        marker = L.marker([X, Y]).addTo(mymap);
+      else
+        marker = L.marker([X,Y], {icon: myIcon}).addTo(mymap);
+
+      markers.push(marker);
+      marker.bindPopup(name);
+
+      if(routes == 1 || routes == (route.length -2))
+        vias.push(name);
+
+      latlngs.push([X, Y])
     }
 
-    if(routes == (route.length-1))
-      marker = L.marker([X, Y]).addTo(mymap);
+    if(vias.length > 1)
+      via = (vias[0].length > vias[1].length) ? vias[1] : vias[0];
     else
-      marker = L.marker([X,Y], {icon: myIcon}).addTo(mymap);
+      via = vias[0];
 
-    markers.push(marker);
-    marker.bindPopup(name);
-
-    if(routes == 1 || routes == (route.length -2))
-      vias.push(name);
-
-    latlngs.push([X, Y])
+    via = "via " + via;
   }
 
   if(Math.floor(dist) < 1000)
@@ -174,31 +190,32 @@ function drawLineAndMarkers(route)
   else
     distText = (dist/1000).toFixed(1) + " km";
 
-  if(vias.length > 1)
-    via = (vias[0].length > vias[1].length) ? vias[1] : vias[0];
-  else
-    via = vias[0];
 
   polyline = L.polyline(latlngs, {color: '#DD4B39', weight: 8}).addTo(mymap);
-  mymap.flyToBounds([latlngs[0],latlngs[latlngs.length-1]], 18)
+  if(latlngs.length > 0)
+    mymap.flyToBounds([latlngs[0],latlngs[latlngs.length-1]], 18)
 
   var slider = document.getElementById("routeInfo"),
       detailsModel = document.getElementById("details"),
       distanceModel = document.getElementById("distance");
-  detailsModel.innerHTML = "via " + via + " ";
+  detailsModel.innerHTML = via + " ";
   distanceModel.innerHTML = distText;
   slider.classList.remove("closed");
 }
 
 function bellmanFord(source, dest)
 {
+  var route;
   if(source == dest)
-    return null
+  {
+    drawLineAndMarkers(null);
+    return;
+  }
 
   var n = distMatrix.length;
   var memo = [];
-  var nodes = [], first;
-  var route = [source];
+  var nodes = [], first,
+      route = [source];
   for(var i=0; i<n; i++)
   {
     var initMemoPerVertex = Number.MAX_VALUE;
