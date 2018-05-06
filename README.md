@@ -16,4 +16,4 @@
     ```
     where the ``` children ``` array holds the ``` name ``` property of each node which can be linked to that node by a straight line path.
 
-Follow this [link](https://bharatkashyap.github.io/thapMaps/thapMapsREADME.html) to get a detailed overview of the project.
+Follow this [link](https://bharatkashyap.github.io/thapmaps/thapMapsREADME.html) to get a detailed overview of the project.
