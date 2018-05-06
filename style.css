@@ -83,6 +83,13 @@
       margin: 0 2vw;
     }
   }
+  @media only screen and (max-height: 400px)
+  {
+    #mapid {
+      top: -52vh!important;
+      left: -2.5vw!important;
+    }
+  }
   input {
     background-color: rgba(255,255,255,1);
     font-size: 1em;

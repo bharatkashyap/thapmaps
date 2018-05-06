@@ -232,7 +232,7 @@ function bellmanFord(source, dest)
       }
     }
   }
-  var j = source;
+  var j = source; // Get the route-array starting at source, to dest
   do {
     route.push(nodes[j]);
     j = nodes[j];
